@@ -25,4 +25,18 @@ return {
   -- 		},
   -- 	},
   -- },
+
+  {
+    "ThePrimeagen/vim-be-good",
+    cmd = "VimBeGood",
+  },
+
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require "configs.harpoon"
+    end,
+  },
 }
