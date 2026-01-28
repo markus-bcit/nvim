@@ -22,7 +22,7 @@ return {
   	opts = {
   		ensure_installed = {
   			"vim", "lua", "vimdoc",
-       "html", "css", "sql"
+       "html", "css", "sql", "python",
   		},
   	},
   },
@@ -56,5 +56,14 @@ return {
     init = function()
       vim.g.db_ui_use_nerd_fonts = 1
     end,
+  },
+
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "pyright",
+      },
+    },
   },
 }
