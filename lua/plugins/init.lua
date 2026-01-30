@@ -63,6 +63,7 @@ return {
     opts = {
       ensure_installed = {
         "pyright",
+        "csharpier",
       },
     },
   },
