@@ -2,6 +2,7 @@
 
 - Starship
 - Powershell 7
+- Fish (linux)
 
 ## Prereqs
 
