@@ -3,7 +3,7 @@ local nvlsp = require "nvchad.configs.lspconfig"
 -- load defaults i.e lua_lsp
 nvlsp.defaults()
 
-local servers = { "html", "cssls", "csharp_ls" }
+local servers = { "html", "cssls", "csharp_ls", "bicep" }
 
 -- lsps with default config
 for _, lsp in ipairs(servers) do
