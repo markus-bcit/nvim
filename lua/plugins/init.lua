@@ -23,8 +23,11 @@ return {
   		ensure_installed = {
   			"vim", "lua", "vimdoc",
        "html", "css", "sql", "python",
-       "bicep",
+       "bicep", "c_sharp",
   		},
+      highlight = {
+        enable = true,
+      },
   	},
   },
 
@@ -66,6 +69,7 @@ return {
         "pyright",
         "csharpier",
         "bicep-lsp",
+        "omnisharp",
       },
     },
   },

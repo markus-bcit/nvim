@@ -3,7 +3,7 @@ local nvlsp = require "nvchad.configs.lspconfig"
 -- load defaults i.e lua_lsp
 nvlsp.defaults()
 
-local servers = { "html", "cssls", "csharp_ls", "bicep" }
+local servers = { "html", "cssls", "bicep" }
 
 -- lsps with default config
 for _, lsp in ipairs(servers) do
@@ -14,6 +14,19 @@ for _, lsp in ipairs(servers) do
   }
   vim.lsp.enable(lsp)
 end
+
+-- OmniSharp setup
+local omnisharp_bin = vim.fn.stdpath "data" .. "/mason/bin/OmniSharp"
+vim.lsp.config.omnisharp = {
+  cmd = { omnisharp_bin, "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
+  on_attach = function(client, bufnr)
+    client.server_capabilities.semanticTokensProvider = nil
+    nvlsp.on_attach(client, bufnr)
+  end,
+  on_init = nvlsp.on_init,
+  capabilities = nvlsp.capabilities,
+}
+vim.lsp.enable "omnisharp"
 
 -- Pyright specific config for better type inference
 vim.lsp.config.pyright = {
