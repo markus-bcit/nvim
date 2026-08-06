@@ -14,6 +14,16 @@ map("n", "<leader>dA", function()
   require("configs.dap").attach_functions_worker()
 end, { desc = "attach to Functions worker" })
 
+-- Explore LINQ: materialize an IEnumerable/IQueryable and show items + SQL.
+-- Normal: word under cursor (a variable). Visual: selected expression.
+-- Requires an active debug session paused at a breakpoint.
+map("n", "<leader>dL", function()
+  require("daptools.explore_linq").explore()
+end, { desc = "explore LINQ (cursor var)" })
+map("v", "<leader>dL", function()
+  require("daptools.explore_linq").explore()
+end, { desc = "explore LINQ (selection)" })
+
 -- hover / docs (hover.nvim) — set after nvchad.mappings so it wins
 map("n", "K", function()
   require("hover").hover()
