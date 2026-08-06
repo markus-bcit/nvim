@@ -114,6 +114,42 @@ vim.api.nvim_create_autocmd("FileType", {
       dotnet.watch()
     end, opts "watch")
 
+    -- Azure Functions (.NET Isolated): run `dotnet run` from the folder containing
+    -- local.settings.json. Per the Core Tools warning, `dotnet run` is the recommended way
+    -- for isolated projects — it builds and starts the Functions host from the correct
+    -- output directory and loads extensions properly (unlike `func start`, which also
+    -- fails to auto-detect language when launched from the solution root). Walks upward from
+    -- the current buffer to find the function project dir.
+    vim.keymap.set("n", "<leader>cf", function()
+      local bufdir = vim.fn.expand "%:p:h"
+      local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
+      local match = type(found) == "table" and found[1] or found
+      if not match or match == "" then
+        vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
+        return
+      end
+      local projdir = vim.fn.fnamemodify(match, ":h")
+      vim.cmd "split"
+      vim.cmd("lcd " .. vim.fn.fnameescape(projdir))
+      vim.cmd "terminal dotnet run"
+    end, opts "run azure function (dotnet run)")
+
+    -- Explicit `func start` from the function project dir — use when you specifically
+    -- want the Azure Functions Core Tools host (e.g. for `func`'s own tooling/probes).
+    vim.keymap.set("n", "<leader>cF", function()
+      local bufdir = vim.fn.expand "%:p:h"
+      local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
+      local match = type(found) == "table" and found[1] or found
+      if not match or match == "" then
+        vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
+        return
+      end
+      local projdir = vim.fn.fnamemodify(match, ":h")
+      vim.cmd "split"
+      vim.cmd("lcd " .. vim.fn.fnameescape(projdir))
+      vim.cmd "terminal func start"
+    end, opts "func start (azure)")
+
     -- secrets / packages / new project
     vim.keymap.set("n", "<leader>cs", function()
       dotnet.secrets()

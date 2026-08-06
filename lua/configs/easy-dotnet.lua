@@ -1,5 +1,35 @@
 local M = {}
 
+-- Guard easy-dotnet's managed-terminal handler against an invalid workingDirectory.
+-- The EasyDotnet server can send a `runCommandManaged` request with an empty/
+-- invalid `workingDirectory` (e.g. when nvim is opened outside a .NET project, or
+-- a Windows-style path from a .sln that Linux nvim rejects), which makes
+-- `vim.fn.termopen` throw `Vim:E475: expected valid directory` inside a
+-- vim.schedule callback — disrupting <leader> and printing a stack trace.
+-- This wrapper falls back to the current working directory (the project root
+-- you launched nvim in) when the server's workingDirectory is unusable, so
+-- legitimate build/run/test commands still proceed. Installed into
+-- package.loaded *before* easy-dotnet's setup() loads rpc-client, so
+-- rpc-client captures this wrapper.
+local MANAGED_HANDLER = "easy-dotnet.rpc.handlers.run_command_managed"
+local _orig_managed = require(MANAGED_HANDLER)
+package.loaded[MANAGED_HANDLER] = function(params, response, throw, validate)
+  local cmd = params and params.command
+  if cmd then
+    local wd = cmd.workingDirectory
+    if wd == nil or wd == "" or vim.fn.isdirectory(wd) == 0 then
+      local cwd = vim.fn.getcwd()
+      if vim.fn.isdirectory(cwd) == 1 then
+        cmd.workingDirectory = cwd
+      else
+        throw { code = -32000, message = "easy-dotnet: no valid working directory and cwd is not a directory" }
+        return
+      end
+    end
+  end
+  return _orig_managed(params, response, throw, validate)
+end
+
 M.config = function()
   local dotnet = require "easy-dotnet"
 
@@ -19,7 +49,12 @@ M.config = function()
     lsp = {
       enabled = true,
       set_fold_expr = false,
-      preload_roslyn = true,
+      -- preload_roslyn=false: starting the server on every nvim launch (even in
+      -- non-.NET dirs) makes the server fire a managed `termopen` with an empty
+      -- workingDirectory → Vim:E475 "expected valid directory" thrown in a
+      -- vim.schedule callback (which also disrupts <leader>). With preload off,
+      -- the server starts lazily when a .cs file is opened, in a real project context.
+      preload_roslyn = false,
       roslynator_enabled = true,
       easy_dotnet_analyzer_enabled = true,
       -- Rider-like: rename file when renaming the class it contains.
@@ -54,8 +89,13 @@ M.config = function()
 
     -- Built-in Rider-like test runner tree. neotest_integration lets neotest
     -- own the inline buffer signs/keymaps while this panel stays as the tree view.
+    -- auto_start_testrunner is OFF: the server would otherwise fire a managed
+    -- `termopen` on startup with an empty working directory when nvim is opened
+    -- outside a .NET project, throwing a Vim:E475 error in a vim.schedule
+    -- callback (which also disrupts <leader>). Open it on demand with
+    -- <leader>ctr (dotnet.testrunner()) inside a real project instead.
     test_runner = {
-      auto_start_testrunner = true,
+      auto_start_testrunner = false,
       hide_legend = false,
       neotest_integration = true,
       viewmode = "float",
