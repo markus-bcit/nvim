@@ -19,10 +19,66 @@ end, { desc = "hover doc" })
 map("n", "<leader>lr", ":IncRename ", { desc = "live rename (preview)" })
 
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
--- Added 
-vim.keymap.set({"n", "v"}, "<leader>rq", ":DB mysql://127.0.0.1:3306<CR>", { desc = "Run Query on MySQL" })
+-- Added
+vim.keymap.set({ "n", "v" }, "<leader>rq", ":DB mysql://127.0.0.1:3306<CR>", { desc = "Run Query on MySQL" })
 
--- C# / .NET
+-- ── Rider-style general LSP / IDE keymaps (all filetypes) ──────────────────
+-- Code-action menu with diff previews (Rider's Alt+Enter).
+map("n", "<leader>ca", function()
+  require("actions-preview").code_actions()
+end, { desc = "code actions (preview)" })
+map("v", "<leader>ca", function()
+  require("actions-preview").code_actions()
+end, { desc = "code actions (preview)" })
+
+-- Trouble — diagnostics / references / quickfix panel (Rider "Errors in Solution").
+-- trouble.nvim v3 command syntax: `:Trouble <mode> [action] [options]`.
+map("n", "<leader>ox", "<cmd>Trouble diagnostics toggle<cr>", { desc = "trouble diagnostics toggle" })
+map("n", "<leader>od", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "trouble buffer diag" })
+map("n", "<leader>oq", "<cmd>Trouble qflist toggle<cr>", { desc = "trouble quickfix" })
+map("n", "<leader>ol", "<cmd>Trouble loclist toggle<cr>", { desc = "trouble loclist" })
+map("n", "<leader>or", "<cmd>Trouble lsp_references toggle<cr>", { desc = "trouble references" })
+map("n", "<leader>oi", "<cmd>Trouble lsp_implementations toggle<cr>", { desc = "trouble impls" })
+map("n", "<leader>oD", "<cmd>Trouble lsp_definitions toggle<cr>", { desc = "trouble definitions" })
+
+-- Aerial — file structure outline (Rider "File Structure").
+map("n", "<leader>oo", "<cmd>AerialToggle!<cr>", { desc = "outline toggle" })
+map("n", "<leader>oO", "<cmd>AerialNav<cr>", { desc = "outline nav" })
+map("n", "{o", function()
+  require("aerial").prev()
+end, { desc = "prev symbol" })
+map("n", "}o", function()
+  require("aerial").next()
+end, { desc = "next symbol" })
+
+-- goto-preview — peek definitions / refs / impls in a floating window.
+map("n", "gpd", require("goto-preview").goto_preview_definition, { desc = "peek definition" })
+map("n", "gpt", require("goto-preview").goto_preview_type_definition, { desc = "peek type def" })
+map("n", "gpi", require("goto-preview").goto_preview_implementation, { desc = "peek impl" })
+map("n", "gpr", require("goto-preview").goto_preview_references, { desc = "peek references" })
+map("n", "gP", require("goto-preview").close_all_win, { desc = "close all peek windows" })
+
+-- refactoring.nvim — Rider refactor menu (capital R = Refactor).
+map("v", "<leader>Re", function()
+  require("refactoring").refactor "Extract Function"
+end, { desc = "extract function" })
+map("v", "<leader>Rv", function()
+  require("refactoring").refactor "Extract Variable"
+end, { desc = "extract variable" })
+map("v", "<leader>Ri", function()
+  require("refactoring").refactor "Inline Variable"
+end, { desc = "inline variable" })
+map({ "n", "v" }, "<leader>Rb", function()
+  require("refactoring").refactor "Extract Block"
+end, { desc = "extract block" })
+map({ "n", "v" }, "<leader>Rp", function()
+  require("refactoring").debug.print_var { normal = true }
+end, { desc = "print var (debug)" })
+map("n", "<leader>Rc", function()
+  require("refactoring").debug.cleanup {}
+end, { desc = "cleanup print vars" })
+
+-- ── C# / .NET (cs buffers) — easy-dotnet Rider-like workflows ──────────────
 local dotnet_group = vim.api.nvim_create_augroup("dotnet_keymaps", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "cs",
@@ -33,15 +89,43 @@ vim.api.nvim_create_autocmd("FileType", {
       return { buffer = buf, desc = "Dotnet " .. desc }
     end
 
-    -- build / run
-    vim.keymap.set("n", "<leader>cb", function()
-      vim.cmd "split | terminal dotnet build"
-    end, opts "build")
-    vim.keymap.set("n", "<leader>cr", function()
-      vim.cmd "split | terminal dotnet run"
-    end, opts "run")
+    local dotnet = require "easy-dotnet"
 
-    -- tests via neotest
+    -- build / run / restore / clean / watch
+    vim.keymap.set("n", "<leader>cb", function()
+      dotnet.build_solution_quickfix()
+    end, opts "build solution (qf)")
+    vim.keymap.set("n", "<leader>cB", function()
+      dotnet.build()
+    end, opts "build project")
+    vim.keymap.set("n", "<leader>cr", function()
+      dotnet.run()
+    end, opts "run project")
+    vim.keymap.set("n", "<leader>cR", function()
+      dotnet.run_default()
+    end, opts "run default project")
+    vim.keymap.set("n", "<leader>cu", function()
+      dotnet.restore()
+    end, opts "restore")
+    vim.keymap.set("n", "<leader>cc", function()
+      dotnet.clean()
+    end, opts "clean")
+    vim.keymap.set("n", "<leader>cw", function()
+      dotnet.watch()
+    end, opts "watch")
+
+    -- secrets / packages / new project
+    vim.keymap.set("n", "<leader>cs", function()
+      dotnet.secrets()
+    end, opts "user secrets")
+    vim.keymap.set("n", "<leader>cp", function()
+      dotnet.outdated()
+    end, opts "outdated packages")
+    vim.keymap.set("n", "<leader>cn", function()
+      dotnet.new()
+    end, opts "new project")
+
+    -- tests via neotest (uses easy-dotnet adapter)
     vim.keymap.set("n", "<leader>ctt", function()
       require("neotest").run.run()
     end, opts "test nearest")
@@ -51,6 +135,9 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>cta", function()
       require("neotest").run.run(vim.fn.getcwd())
     end, opts "test all")
+    vim.keymap.set("n", "<leader>ctd", function()
+      require("neotest").run.run { strategy = "dap" }
+    end, opts "debug nearest test")
     vim.keymap.set("n", "<leader>cts", function()
       require("neotest").run.stop()
     end, opts "test stop")
@@ -60,11 +147,27 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>ctp", function()
       require("neotest").summary.toggle()
     end, opts "test summary panel")
+    -- Rider-like test runner tree (separate from neotest summary)
+    vim.keymap.set("n", "<leader>ctr", function()
+      dotnet.testrunner()
+    end, opts "test runner tree")
 
-    -- debug
+    -- debug (project + launch-profile aware via easy-dotnet)
     vim.keymap.set("n", "<leader>dd", function()
+      dotnet.debug()
+    end, opts "debug project")
+    vim.keymap.set("n", "<leader>dD", function()
+      dotnet.debug_default()
+    end, opts "debug default project")
+    vim.keymap.set("n", "<leader>dp", function()
+      dotnet.debug_profile()
+    end, opts "debug launch profile")
+    vim.keymap.set("n", "<leader>da", function()
+      dotnet.debug_attach()
+    end, opts "debug attach")
+    vim.keymap.set("n", "<leader>dc", function()
       require("dap").continue()
-    end, opts "debug continue/start")
+    end, opts "debug continue/resume")
     vim.keymap.set("n", "<leader>db", function()
       require("dap").toggle_breakpoint()
     end, opts "debug toggle breakpoint")

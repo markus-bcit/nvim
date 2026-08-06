@@ -15,18 +15,9 @@ for _, lsp in ipairs(servers) do
   vim.lsp.enable(lsp)
 end
 
--- OmniSharp setup
-local omnisharp_bin = vim.fn.stdpath "data" .. "/mason/bin/OmniSharp"
-vim.lsp.config.omnisharp = {
-  cmd = { omnisharp_bin, "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
-  on_attach = function(client, bufnr)
-    client.server_capabilities.semanticTokensProvider = nil
-    nvlsp.on_attach(client, bufnr)
-  end,
-  on_init = nvlsp.on_init,
-  capabilities = nvlsp.capabilities,
-}
-vim.lsp.enable "omnisharp"
+-- C# / .NET: handled by easy-dotnet.nvim, which manages the official Roslyn
+-- language server (the modern, performant successor to the deprecated OmniSharp).
+-- Decompilation / metadata doc navigation work natively via vim.lsp.buf.definition.
 
 -- Pyright specific config for better type inference
 vim.lsp.config.pyright = {

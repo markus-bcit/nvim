@@ -16,7 +16,8 @@ return {
     },
   },
 
-  -- Test runner
+  -- Test runner — uses easy-dotnet's neotest adapter so the Rider-like test
+  -- runner tree and neotest share the same discovery state.
   {
     "nvim-neotest/neotest",
     lazy = false,
@@ -24,15 +25,12 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       "antoinemadec/FixCursorHold.nvim",
-      "Issafalcon/neotest-dotnet",
+      "GustavEikaas/easy-dotnet.nvim",
     },
     config = function()
       require("neotest").setup {
         adapters = {
-          require("neotest-dotnet") {
-            -- pick up any framework; default discovery is fine
-            dap = { justMyCode = true },
-          },
+          require("easy-dotnet.neotest"),
         },
         icons = {
           passing = "",

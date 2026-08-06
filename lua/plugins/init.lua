@@ -51,12 +51,15 @@ return {
         end,
       })
 
-      -- start treesitter highlight + indent for any buffer with a parser
+      -- start treesitter highlight + indent for any buffer with a parser.
+      -- Skip the indentexpr override for C#: easy-dotnet/Roslyn own indentation
+      -- (setting nvim-treesitter's indentexpr for cs breaks it — see
+      -- https://github.com/GustavEikaas/easy-dotnet.nvim/issues/873).
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(args)
           local buf = args.buf
           local ok = pcall(vim.treesitter.start, buf)
-          if ok then
+          if ok and vim.bo[buf].filetype ~= "cs" then
             vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
         end,
@@ -105,8 +108,6 @@ return {
           "pyright",
           "csharpier",
           "bicep-lsp",
-          "omnisharp",
-          "netcoredbg",
         },
         auto_update = false,
         run_on_start = true,

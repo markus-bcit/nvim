@@ -1,20 +1,5 @@
 local M = {}
 
-local function get_dll_path()
-  local cwd = vim.fn.getcwd()
-  local bin_dir = cwd .. "/bin/Debug/"
-  local matches = vim.fn.globpath(bin_dir, "**/*.dll", true, true)
-  if #matches == 0 then
-    vim.notify("No .dll found under bin/Debug. Build the project first (:DotnetBuild).", vim.log.levels.ERROR)
-    return nil
-  end
-  -- prefer the most recently built dll
-  table.sort(matches, function(a, b)
-    return vim.fn.getftime(b) > vim.fn.getftime(a)
-  end)
-  return matches[1]
-end
-
 M.config = function()
   local dap = require "dap"
   local dapui = require "dapui"
@@ -53,34 +38,10 @@ M.config = function()
 
   dapui.setup {}
 
-  -- netcoredbg adapter (installed via mason)
-  local netcoredbg_path = vim.fn.stdpath "data" .. "/mason/bin/netcoredbg"
-  dap.adapters.coreclr = {
-    type = "executable",
-    command = netcoredbg_path,
-    args = { "--interpreter=vscode" },
-  }
-
-  dap.configurations.cs = {
-    {
-      type = "coreclr",
-      name = "launch - netcoredbg",
-      request = "launch",
-      program = get_dll_path,
-      cwd = "${workspaceFolder}",
-      stopAtEntry = false,
-      justMyCode = true,
-    },
-    {
-      type = "coreclr",
-      name = "attach - netcoredbg",
-      request = "attach",
-      processId = function()
-        return tonumber(vim.fn.input "Process ID: ")
-      end,
-      cwd = "${workspaceFolder}",
-    },
-  }
+  -- The coreclr / netcoredbg adapter and the per-project launch configurations
+  -- are registered by easy-dotnet.nvim (debugger.auto_register_dap = true),
+  -- which is project + launch-profile aware. Start a session with :Dotnet debug
+  -- (or the <leader>dd mapping); :DapContinue resumes an active session.
 
   -- Auto open/close DAP UI
   dap.listeners.after.event_initialized["dapui_config"] = function()

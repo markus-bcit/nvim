@@ -25,6 +25,7 @@ require("lazy").setup({
   { import = "plugins" },
   { import = "plugins.dap" },
   { import = "plugins.docs" },
+  { import = "plugins.csharp" },
 }, lazy_config)
 
 -- load theme
