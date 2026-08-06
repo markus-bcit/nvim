@@ -1,0 +1,137 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions":
+    [
+        {
+            "command":
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste"
+        },
+        {
+            "command": "find",
+            "id": "User.find"
+        },
+        {
+            "command":
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.A6751878"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+    "keybindings":
+    [
+        {
+            "id": "Terminal.OpenNewWindow",
+            "keys": "ctrl+shift+n"
+        },
+        {
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "User.splitPane.A6751878",
+            "keys": "alt+shift+d"
+        }
+    ],
+    "newTabMenu":
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles":
+    {
+        "defaults":
+        {
+            "colorScheme": "Solarized Dark",
+            "opacity": 94
+        },
+        "list":
+        [
+            {
+                "colorScheme": "One Half Dark",
+                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "hidden": false,
+                "name": "PowerShell",
+                "source": "Windows.Terminal.PowershellCore"
+            },
+            {
+                "colorScheme": "One Half Dark",
+                "cursorShape": "underscore",
+                "experimental.retroTerminalEffect": false,
+                "font":
+                {
+                    "face": "CaskaydiaCove Nerd Font"
+                },
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "opacity": 80,
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
+            }
+        ]
+    },
+    "schemes":
+    [
+        {
+            "background": "#002B36",
+            "black": "#002B36",
+            "blue": "#268BD2",
+            "brightBlack": "#073642",
+            "brightBlue": "#268BD2",
+            "brightCyan": "#2AA198",
+            "brightGreen": "#859900",
+            "brightPurple": "#6C71C4",
+            "brightRed": "#CB4B16",
+            "brightWhite": "#FDF6E3",
+            "brightYellow": "#B58900",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#2AA198",
+            "foreground": "#839496",
+            "green": "#859900",
+            "name": "Solarized Dark (Copy)",
+            "purple": "#D33682",
+            "red": "#DC322F",
+            "selectionBackground": "#FFFFFF",
+            "white": "#EEE8D5",
+            "yellow": "#B58900"
+        }
+    ],
+    "themes": []
+}
+~
+~
+~
+~

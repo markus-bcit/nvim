@@ -18,17 +18,50 @@ return {
 
   {
   	"nvim-treesitter/nvim-treesitter",
+    branch = "main",
     lazy = false,
-  	opts = {
-  		ensure_installed = {
-  			"vim", "lua", "vimdoc",
-       "html", "css", "sql", "python",
-       "bicep", "c_sharp",
-  		},
-      highlight = {
-        enable = true,
-      },
-  	},
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter").setup {}
+
+      -- parsers to keep installed
+      local ensure_installed = {
+        "vim", "lua", "vimdoc",
+        "html", "css", "sql", "python",
+        "bicep", "c_sharp",
+      }
+
+      -- auto-install missing parsers once on startup
+      vim.api.nvim_create_autocmd("VimEnter", {
+        once = true,
+        callback = function()
+          local installed = {}
+          for _, lang in ipairs(require("nvim-treesitter").get_installed "parsers") do
+            installed[lang] = true
+          end
+          local missing = {}
+          for _, lang in ipairs(ensure_installed) do
+            if not installed[lang] then
+              missing[#missing + 1] = lang
+            end
+          end
+          if #missing > 0 then
+            vim.cmd("TSInstall " .. table.concat(missing, " "))
+          end
+        end,
+      })
+
+      -- start treesitter highlight + indent for any buffer with a parser
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          local buf = args.buf
+          local ok = pcall(vim.treesitter.start, buf)
+          if ok then
+            vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
   },
 
   {
@@ -64,13 +97,24 @@ return {
 
   {
     "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "pyright",
-        "csharpier",
-        "bicep-lsp",
-        "omnisharp",
-      },
+    lazy = false,
+    config = function()
+      require("mason").setup {}
+      require("mason-tool-installer").setup {
+        ensure_installed = {
+          "pyright",
+          "csharpier",
+          "bicep-lsp",
+          "omnisharp",
+          "netcoredbg",
+        },
+        auto_update = false,
+        run_on_start = true,
+        start_delay = 3000,
+      }
+    end,
+    dependencies = {
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
     },
   },
 }
