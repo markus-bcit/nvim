@@ -7,6 +7,13 @@ local map = vim.keymap.set
 map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
 
+-- Attach netcoredbg to a running Azure Functions isolated-worker process.
+-- Global (not cs-buffer-local) so it can be triggered from any normal buffer
+-- after starting the function with <leader>cf / <leader>cF.
+map("n", "<leader>dA", function()
+  require("configs.dap").attach_functions_worker()
+end, { desc = "attach to Functions worker" })
+
 -- hover / docs (hover.nvim) — set after nvchad.mappings so it wins
 map("n", "K", function()
   require("hover").hover()
@@ -150,6 +157,25 @@ vim.api.nvim_create_autocmd("FileType", {
       vim.cmd "terminal func start"
     end, opts "func start (azure)")
 
+    -- Start the Azure Functions host in DEBUG mode: the .NET isolated worker is
+    -- PAUSED at startup waiting for a debugger to attach (sets
+    -- FUNCTIONS_ENABLE_DEBUGGER_WAIT and the DOTNET_STARTUP_HOOKS). The host
+    -- prints "Azure Functions .NET Worker (PID: <pid>) initialized in debug
+    -- mode. Waiting for debugger to attach...". Attach with <leader>dA.
+    vim.keymap.set("n", "<leader>cD", function()
+      local bufdir = vim.fn.expand "%:p:h"
+      local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
+      local match = type(found) == "table" and found[1] or found
+      if not match or match == "" then
+        vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
+        return
+      end
+      local projdir = vim.fn.fnamemodify(match, ":h")
+      vim.cmd "split"
+      vim.cmd("lcd " .. vim.fn.fnameescape(projdir))
+      vim.cmd "terminal func start --dotnet-isolated-debug"
+    end, opts "func start (debug, paused)")
+
     -- secrets / packages / new project
     vim.keymap.set("n", "<leader>cs", function()
       dotnet.secrets()
@@ -201,6 +227,8 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>da", function()
       dotnet.debug_attach()
     end, opts "debug attach")
+    -- <leader>dA is registered globally (below the autocmd) so it also works
+    -- from non-cs buffers.
     vim.keymap.set("n", "<leader>dc", function()
       require("dap").continue()
     end, opts "debug continue/resume")

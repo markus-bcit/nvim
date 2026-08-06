@@ -4,7 +4,7 @@ return {
     "mfussenegger/nvim-dap",
     lazy = false,
     config = function()
-      require "configs.dap"
+      require("configs.dap").config()
     end,
     dependencies = {
       {
