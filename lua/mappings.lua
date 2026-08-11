@@ -140,7 +140,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>cf", function()
       local bufdir = vim.fn.expand "%:p:h"
       local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
-      local match = type(found) == "table" and found[1] or found
+      local match = found[1]
       if not match or match == "" then
         vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
         return
@@ -156,7 +156,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>cF", function()
       local bufdir = vim.fn.expand "%:p:h"
       local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
-      local match = type(found) == "table" and found[1] or found
+      local match = found[1]
       if not match or match == "" then
         vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
         return
@@ -175,7 +175,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>cD", function()
       local bufdir = vim.fn.expand "%:p:h"
       local found = vim.fs.find("local.settings.json", { upward = true, path = bufdir })
-      local match = type(found) == "table" and found[1] or found
+      local match = found[1]
       if not match or match == "" then
         vim.notify("No local.settings.json found upward from " .. bufdir, vim.log.levels.ERROR)
         return

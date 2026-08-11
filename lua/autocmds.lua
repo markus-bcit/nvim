@@ -1,5 +1,44 @@
 require "nvchad.autocmds"
 
+-- Force a transparent background so the terminal (and its opacity) shows through.
+-- Runs after any colorscheme loads so it always wins over the base46 cache.
+local transparent_group = vim.api.nvim_create_augroup("force_transparency", { clear = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = transparent_group,
+  callback = function()
+    local groups = {
+      "Normal",
+      "NormalNC",
+      "NormalFloat",
+      "FloatBorder",
+      "SignColumn",
+      "LineNr",
+      "CursorLineNr",
+      "EndOfBuffer",
+      "VertSplit",
+      "WinSeparator",
+      "Folded",
+      "FoldColumn",
+      "TabLine",
+      "TabLineFill",
+      "StatusLine",
+      "StatusLineNC",
+      "NvimTreeNormal",
+      "NvimTreeNormalNC",
+      "TelescopeNormal",
+      "TelescopeBorder",
+    }
+    for _, name in ipairs(groups) do
+      vim.api.nvim_set_hl(0, name, { bg = "none", ctermbg = "NONE" })
+    end
+  end,
+})
+
+-- Apply immediately for the current session too.
+vim.schedule(function()
+  vim.api.nvim_exec_autocmds("ColorScheme", { group = transparent_group })
+end)
+
 -- Disable folding in Dadbod UI output
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "dbout",
