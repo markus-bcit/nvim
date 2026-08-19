@@ -74,7 +74,28 @@ M.config = function()
         -- `npm i -g vscode-langservers-extracted`) if you edit Razor views.
         html = { enabled = false, cmd = nil, request_timeout = 5000 },
       },
-      config = {},
+      config = {
+        settings = {
+          -- Roslyn computes inlay hints only when asked via these options
+          -- (server-side defaults are all off, same as VS Code / Rider).
+          ["csharp|inlay_hints"] = {
+            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+            csharp_enable_inlay_hints_for_implicit_object_creation = true,
+            csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+            csharp_enable_inlay_hints_for_lambda_return_types = true,
+            csharp_enable_inlay_hints_for_parameters = true,
+            csharp_enable_inlay_hints_for_types = true,
+            dotnet_enable_inlay_hints_for_indexer_parameters = true,
+            dotnet_enable_inlay_hints_for_literal_parameters = true,
+            dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+            dotnet_enable_inlay_hints_for_other_parameters = true,
+            dotnet_enable_inlay_hints_for_parameters = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+            dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+          },
+        },
+      },
     },
 
     -- Debugger — netcoredbg, auto-registered with nvim-dap so :DapContinue works

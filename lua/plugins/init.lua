@@ -99,6 +99,36 @@ return {
   },
 
   {
+    "MagicDuck/grug-far.nvim",
+    cmd = { "GrugFar", "GrugFarWithin" },
+    keys = {
+      {
+        "<leader>fr",
+        function()
+          require("grug-far").open()
+        end,
+        desc = "find and replace (project)",
+      },
+      {
+        "<leader>fR",
+        function()
+          require("grug-far").open { prefills = { search = vim.fn.expand "<cword>" } }
+        end,
+        desc = "find and replace (cursor word)",
+      },
+      {
+        "<leader>fr",
+        function()
+          require("grug-far").with_visual_selection()
+        end,
+        mode = "v",
+        desc = "find and replace (selection)",
+      },
+    },
+    opts = {},
+  },
+
+  {
     "williamboman/mason.nvim",
     lazy = false,
     config = function()
