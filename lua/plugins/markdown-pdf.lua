@@ -10,7 +10,7 @@ local function export_markdown_to_pdf()
   local pdf_file = vim.fn.expand("%:p:r") .. ".pdf"
   local filename = vim.fn.expand("%:t:r") .. ".pdf"
 
-  vim.notify("Exporting " .. filename .. " (Letter size)...", vim.log.levels.INFO, { title = "Markdown Export" })
+  vim.notify("Exporting " .. filename .. " (Letter size, 12pt)...", vim.log.levels.INFO, { title = "Markdown Export" })
 
   local pdf_options = vim.json.encode({
     format = "Letter",
@@ -22,7 +22,16 @@ local function export_markdown_to_pdf()
     },
   })
 
-  vim.system({ "npx", "--yes", "md-to-pdf", file, "--pdf-options", pdf_options }, { text = true }, function(obj)
+  vim.system({
+    "npx",
+    "--yes",
+    "md-to-pdf",
+    file,
+    "--css",
+    "body { font-size: 12pt; }",
+    "--pdf-options",
+    pdf_options,
+  }, { text = true }, function(obj)
     vim.schedule(function()
       if obj.code == 0 then
         vim.notify("Successfully exported:\n" .. pdf_file, vim.log.levels.INFO, { title = "Markdown Export" })
@@ -40,13 +49,7 @@ return {
       {
         "<leader>ce",
         export_markdown_to_pdf,
-        desc = "Export Markdown to PDF (Letter)",
-        ft = "markdown",
-      },
-      {
-        "<leader>cr",
-        export_markdown_to_pdf,
-        desc = "Export Markdown to PDF (Letter)",
+        desc = "Export Markdown to PDF",
         ft = "markdown",
       },
     },
