@@ -10,7 +10,7 @@ local function export_markdown_to_pdf()
   local pdf_file = vim.fn.expand("%:p:r") .. ".pdf"
   local filename = vim.fn.expand("%:t:r") .. ".pdf"
 
-  vim.notify("Exporting " .. filename .. " (Letter size, 12pt)...", vim.log.levels.INFO, { title = "Markdown Export" })
+  vim.notify("Exporting " .. filename .. " (Letter size)...", vim.log.levels.INFO, { title = "Markdown Export" })
 
   local pdf_options = vim.json.encode({
     format = "Letter",
@@ -22,13 +22,16 @@ local function export_markdown_to_pdf()
     },
   })
 
+  -- Scale the entire document typography up ~14% evenly (default was 0.6875em)
+  local css = "body { font-size: 0.78em; }"
+
   vim.system({
     "npx",
     "--yes",
     "md-to-pdf",
     file,
     "--css",
-    "body { font-size: 12pt; }",
+    css,
     "--pdf-options",
     pdf_options,
   }, { text = true }, function(obj)
@@ -49,7 +52,7 @@ return {
       {
         "<leader>ce",
         export_markdown_to_pdf,
-        desc = "Export Markdown to PDF",
+        desc = "Export Markdown to PDF (Letter)",
         ft = "markdown",
       },
     },
